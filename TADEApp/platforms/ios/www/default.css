@@ -1,0 +1,90 @@
+@charset "utf-8";
+/* CSS Document */
+* {
+    text-shadow:0 0 0 transparent;
+    text-shadow:none;
+}
+body {	margin: 0px; font-family: HelveticaNeue  ,Helvetica,Arial,Utkal,sans-serif,微軟正黑體;}
+
+.border_solid {	border-width: 3px;	border-top-style: none;	border-right-style: none;	border-bottom-style: solid;	border-left-style: none;	border-color: #CCC;}
+
+.content_01 {	font-size: 16px;	color: #333;	text-decoration: none;	line-height: 28px;}
+.content_02 {	font-size: 16px;	color: #2c8dcb;	text-decoration: none;	line-height: 28px;}
+
+.input {	font-size: 14px;	color: #666;	background-color: #F1F1F1;	border-style: none;}
+
+.date {	font-size: 14px;	color: #888;	text-decoration: none;	font-weight: normal;}
+
+.menu_shadow {	box-shadow:	0px 8px 16px -1px rgba(20%,20%,20%,0.7);}
+
+.navi {	font-size: 14px;	color: #888;	text-decoration: none;	font-weight: normal;padding:5px;}
+
+.title_01 {	font-size: 16px;	color: #555;	text-decoration: none;}
+.title_02 {	font-size: 16px;	color: #333;	text-decoration: none;	font-weight: bold;}
+
+a.list_link:link {		font-size: 14px;	color: #333;	font-weight: bold;	text-decoration: none;}
+a.list_link:visited {	font-size: 14px;	color: #333;	font-weight: bold;	text-decoration: none;}
+a.list_link:hover {		font-size: 14px;	color: #333;	font-weight: bold;	text-decoration: none;}
+a.list_link:active {	font-size: 14px;	color: #333;	font-weight: bold;	text-decoration: none;}
+
+a.list_link_thin:link {		font-size: 14px;	color: #333;	font-weight: normal;	text-decoration: none;}
+a.list_link_thin:visited {	font-size: 14px;	color: #333;	font-weight: normal;	text-decoration: none;}
+a.list_link_thin:hover {	font-size: 14px;	color: #333;	font-weight: normal;	text-decoration: none;}
+a.list_link_thin:active {	font-size: 14px;	color: #333;	font-weight: normal;	text-decoration: none;}
+
+a.desc_link_thin:link {		font-size: 13px;	color: #333;	font-weight: normal;	text-decoration: none;}
+a.desc_link_thin:visited {	font-size: 13px;	color: #333;	font-weight: normal;	text-decoration: none;}
+a.desc_link_thin:hover {	font-size: 13px;	color: #333;	font-weight: normal;	text-decoration: none;}
+a.desc_link_thin:active {	font-size: 13px;	color: #333;	font-weight: normal;	text-decoration: none;}
+
+a.list_link_small_w:link {		font-size: 10px;	color: #FFF;	font-weight: normal;	text-decoration: none; display:block;line-height:12px;}
+a.list_link_small_w:visited {	font-size: 10px;	color: #FFF;	font-weight: normal;	text-decoration: none; display:block;line-height:12px;}
+a.list_link_small_w:hover {		font-size: 10px;	color: #FFF;	font-weight: normal;	text-decoration: none; display:block;line-height:12px;}
+a.list_link_small_w:active {	font-size: 10px;	color: #FFF;	font-weight: normal;	text-decoration: none; display:block;line-height:12px;}
+
+a.list_link_02:link {	font-size: 14px;	color: #FFF;	text-decoration: none;	line-height: 12px;}
+a.list_link_02:visited {font-size: 14px;	color: #FFF;	text-decoration: none;	line-height: 12px;}
+a.list_link_02:hover {	font-size: 14px;	color: #FFF;	text-decoration: none;	line-height: 12px;}
+a.list_link_02:active {	font-size: 14px;	color: #FFF;	text-decoration: none;	line-height: 12px;}
+
+a.menu_link:link {		font-size: 15px;	color: #FFF;	text-decoration: none;font-weight: bold; letter-spacing: 1px;}
+a.menu_link:visited {	font-size: 15px;	color: #FFF;	text-decoration: none;font-weight: bold; letter-spacing: 1px;}
+a.menu_link:hover {		font-size: 15px;	color: #FFF;	text-decoration: none;font-weight: bold; letter-spacing: 1px;}
+a.menu_link:active {	font-size: 15px;	color: #FFF;	text-decoration: none;font-weight: bold; letter-spacing: 1px;}
+
+a.rightmenu_link:link {		font-size: 17px;	color: #FFF;	font-weight: bold;	text-decoration: none;}
+a.rightmenu_link:visited {	font-size: 17px;	color: #FFF;	font-weight: bold;	text-decoration: none;}
+a.rightmenu_link:hover {	font-size: 17px;	color: #FFF;	font-weight: bold;	text-decoration: none;}
+a.rightmenu_link:active {	font-size: 17px;	color: #FFF;	font-weight: bold;	text-decoration: none;}
+
+.menu_over {	font-size: 17px;	color: #FFF;	text-decoration: none;}
+
+.input {	font-size: 24px;	color: #666;}
+
+.full_img {
+    width:100%;
+    display:block;
+}
+.swiper-container {
+    width: 100%;
+    height:auto;
+}
+.swiper-slide {
+    text-align: center;
+    font-size: 18px;
+    background: #fff;
+    
+    /* Center slide text vertically */
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+}

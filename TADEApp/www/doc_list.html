@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="themes/Bootstrap.css">
+<link rel="stylesheet" href="css/jquery.mobile.structure-1.4.0.min.css" />
+<link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" />
+<link href="default.css" rel="stylesheet" type="text/css" />
+<script src="js/jquery-1.8.2.min.js"></script>
+<script src="js/jquery.mobile-1.4.0.min.js"></script>
+
+<script type="text/javascript" src="cordova.js"></script>
+<script type="text/javascript" src="js/index.js"></script>
+<script type="text/javascript" src="js/pub.js"></script>
+<script type="text/javascript" src="js/checklogin.js"></script>
+
+    <script type="text/javascript">
+
+    $(document).ready(function(event) {
+                      
+                      //位移menu位置
+                      $( "#top_menu" ).scrollLeft( 450 );
+                      
+                      //login
+                      CheckUserToken(userToken,"","","","");
+                      
+                      loadData();
+                      loadData_RelatedApp();
+                      
+                      });
+    
+    
+    document.addEventListener("deviceready", onDeviceReady, false);
+    
+    function onDeviceReady() {
+        //get device
+        devicePlatform = device.platform;
+        
+        document.addEventListener("resume", onResume, false);
+        
+    }
+    
+    //Page Number
+    var PageNum = 1;
+    function loadData(){
+        //$("#loader").show();
+        $.ajax({
+               type : "GET",
+               dataType : "jsonp",
+               url : "http://210.65.89.114/TADE/Xml/Doc.aspx",
+               crossDomain: true,
+               contentType: "application/json; charset=utf-8",
+               data : {"PageNum":PageNum,"Device":devicePlatform},
+               success: function(obj){
+               genTableView(obj);
+               },
+               error: function(xhr, status, error) { alert('讀取資料失敗 !!'); },
+               async: false,
+               cache: false
+               });
+    }
+    
+    
+    var jsonObj;
+    var TotalPage;
+    function genTableView(jsonData){
+        //NKLog(PageNum);
+        jsonObj = jsonData;
+        
+        if(PageNum == 1){
+            document.getElementById('dv_list').innerHTML = "";
+            
+        }
+        
+        var tableView = "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">";
+        var bg_color = "#FAEDE9";
+        for(var loopy = 0; loopy < jsonObj.datas.length; loopy++){
+            if(loopy % 2 == 1) {
+                bg_color = "#FAEDE9";
+            }else{
+                bg_color = "#ffffff";
+            }
+            
+            tableView += "<tr>";
+            tableView += "  <td><table width=\"100%\" border=\"0\" cellpadding=\"6\" cellspacing=\"0\" bgcolor=\""+bg_color+"\">";
+            tableView += "  <tr><td width=\"100\">";
+            tableView += "    <a href=\"#\" onclick=\"doc_detail("+jsonObj.datas[loopy].DocID+");\"><img src='"+jsonObj.datas[loopy].BannerImg+"' width='100' style='display:block;' border=0 /></a></td>";
+            tableView += "  <td valign=\"top\">";
+            tableView += "    <a href=\"#\" onclick=\"doc_detail("+jsonObj.datas[loopy].DocID+");\" class=\"list_link_thin\">"+unescape(jsonObj.datas[loopy].DocTitle)+"</a>";
+            tableView += "  </td>";
+            tableView += "  </tr>";
+            tableView += "  </table></td>";
+            tableView += "</tr>";
+
+            TotalPage = jsonObj.datas[loopy].TotalPage;
+            
+        }
+        
+        tableView += "</table>";
+        
+        $("#dv_list").append(tableView);
+        
+        PageNum = PageNum + 1;
+        
+        $("#loader").hide();
+    }
+
+    function loadData_RelatedApp(){
+        
+        $.ajax({
+               type : "GET",
+               dataType : "jsonp",
+               url : "http://210.65.89.114/TADE/Xml/RelatedApp.aspx",
+               crossDomain: true,
+               contentType: "application/json; charset=utf-8",
+               data : {"Device":devicePlatform},
+               success: function(obj){
+               genTableView_RelatedApp(obj);
+               },
+               error: function(xhr, status, error) { alert('讀取資料失敗 !!'); },
+               async: false,
+               cache: false
+               });
+    }
+    function genTableView_RelatedApp(jsonData){
+        
+        //NKLog(PageNum);
+        var jsonObj_RA = jsonData;
+        
+        var htmlView = "";
+        for(var loopy = 0; loopy < jsonObj_RA.datas.length; loopy++){
+            
+            htmlView += "<img src=\"images/menu_icon_line.png\" width=\"98%\" height=\"2\"";
+            
+            htmlView += "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">";
+            htmlView += "<tr>";
+            htmlView += "<td width=\"45\"><img src=\""+jsonObj_RA.datas[loopy].AppImg+"\" width=\"45\" /></td>";
+            htmlView += "<td bgcolor=\"#2F2E2E\"><a href=\"#\" onclick=\"OpenBrowser('"+jsonObj_RA.datas[loopy].AppUrl+"');\" class=\"rightmenu_link\">"+unescape(jsonObj_RA.datas[loopy].AppName)+"</a></td>";
+            htmlView += "</tr>";
+            htmlView += "</table>";
+        }
+        
+        $("#dv_relatedapp").append(htmlView);
+        
+    }
+
+    function onResume(){
+        reloadPage();
+    }
+
+    //reload page
+    function reloadPage(){
+        $(window).scrollTop(0);
+        PageNum = 1;
+        loadData();
+        loadData_RelatedApp();
+    }
+    function doc_detail(DocID){
+        window.localStorage.setItem('DocID',DocID);
+        
+        location = 'doc_detail.html';
+    }
+    
+    window.onscroll = function () {
+        
+        if ($(window).scrollTop() == $(document).height() - $(window).height() && PageNum <= TotalPage) {
+            
+            loadData();
+        }
+        
+    }
+    
+    </script>
+    </head>
+    <body>
+        <div id="demo-page" data-role="page" data-url="demo-page" data-theme="a">
+            <div data-role="header" data-position="fixed" style="background-color:#ffffff;height:90px;border:#ffffff 0px solid;">
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td width="60" align="center"><a href="#" onclick="location='index.html';"><img src="images/top_logo.png" height="40" border="0" /></a></td>
+                        <td><a href="#"><img src="images/top_logo_text.png" height="50" border="0" /></a></td>
+                        <td width="45"><a href="#" onclick="$( '#right-panel' ).panel().panel('open');"><img src="images/top_menu.png" height="40" border="0" /></a></td>
+                    </tr>
+                </table>
+                <div id="top_menu" style="background-image:url(images/menu_bg.png);width:100%; height:30px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling: touch;">
+                    <table width="685" border="0" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td width="100" align="center"><a href="#" onclick="location='aboutus.html';" class="menu_link">學會訊息</a></td>
+                            <td width="1"><img src="images/menu_line.png" height="25" /></td>
+                            <td width="120" align="center"><a href="#" onclick="LoadCate(1);" class="menu_link">學會學術演講</a></td>
+                            <td width="1"><img src="images/menu_line.png" height="25" /></td>
+                            <td width="120" align="center"><a href="#" onclick="LoadCate(3);" class="menu_link">繼續教育演講</a></td>
+                            <td width="1"><img src="images/menu_line.png" height="25" /></td>
+                            <td width="120" align="center"><a href="#" onclick="LoadCate(4);" class="menu_link">衛教雲端電台</a></td>
+                            <td width="1"><img src="images/menu_line.png" height="25" /></td>
+                            <td width="120" align="center"><a href="#" onclick="LoadCate(6);" class="menu_link">個人職能精進</a></td>
+                            <td width="1"><img src="images/menu_line.png" height="25" /></td>
+                            <td width="100" align="center" background="images/menu_bg_over100.png"><a href="#" onclick="location='doc_list.html';" class="menu_link">文獻快遞</a></td>
+                        </tr>
+                    </table>
+
+                </div>
+            </div>
+            <div data-role="content" data-theme="a" style="margin:0;padding:0">
+                <div id="dv_list" style="padding:5px">
+                </div>
+                <div style="text-align:center;padding:5px">
+                    <img id="loader" alt="Loading" src="images/loading.gif" style="display: none" />
+                </div>
+            </div>
+            <div id="footer" data-role="footer" data-theme="a" style="background-color:#A95C68;margin:0;padding:0;height:35px" data-position="fixed" data-tap-toggle="false">
+                <div >
+                    <span style="float:left;"><a href="#" onclick="onBackKey();"><img src="images/btn_back.png" width="35" border="0" /></a></span>
+                    <span style="float:right;"><a href="#" onclick="location='index.html';"><img src="images/btn_home.png" width="35" border="0" /></a><span>
+                        </div>
+            </div>
+            <div data-role="panel" id="right-panel" data-position="right" data-display="overlay" style="background-color:#2F2E2E;margin:0;padding:0">
+                <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td width="50"><img src="images/menu_icon_01.png" width="50" /></td>
+                                <td bgcolor="#2F2E2E"><a href="#" onclick="location='index.html';" class="rightmenu_link">Home</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td><img src="images/menu_icon_line.png" height="2" width="98%" /></td>
+                    </tr>
+                    <tr>
+                        <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td bgcolor="#2F2E2E">
+                                    <form action="#" method="get" onsubmit="searchChk();">
+                                        <div data-role="fieldcontain">
+                                            <input type="search" name="SearchStr" id="SearchStr" value="" />
+                                        </div>
+                                    </form>
+                                </td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td><img src="images/menu_icon_line.png" height="2" width="98%" /></td>
+                    </tr>
+                    
+                    <tr>
+                        <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td width="45"><img src="images/menu_icon_06.png" width="45" /></td>
+                                <td bgcolor="#2F2E2E"><a href="#" onclick="location='favorite.html';" class="rightmenu_link">我的收藏</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td><img src="images/menu_icon_line.png" height="2" width="98%" /></td>
+                    </tr>
+                    <tr>
+                        <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td width="45"><img src="images/menu_icon_10.png" width="45" /></td>
+                                <td bgcolor="#2F2E2E"><a href="#" id="sp_login" class="rightmenu_link">會員登入</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div id="dv_relatedapp"></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><img src="images/menu_icon_line.png" height="2" width="98%" /></td>
+                    </tr>
+                    <tr>
+                        <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td width="45"><img data-rel="close" src="images/menu_icon_09.png" width="45" /></td>
+                                <td bgcolor="#2F2E2E"><a href="#" onclick="location='manual.html';" class="rightmenu_link">使用說明</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td><img src="images/menu_icon_line.png" height="2" width="98%" /></td>
+                    </tr>
+                    <tr>
+                        <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td width="45"><img data-rel="close" src="images/menu_icon_08.png" width="45" /></td>
+                                <td bgcolor="#2F2E2E"><a href="#" data-rel="close" class="rightmenu_link">關閉</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td><img src="images/menu_icon_line.png" height="2" width="98%" /></td>
+                    </tr>
+                </table>
+            </div><!-- /panel -->
+        </div>
+    </body>
+</html>

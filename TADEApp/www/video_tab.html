@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="themes/Bootstrap.css">
+<link rel="stylesheet" href="css/jquery.mobile.structure-1.4.0.min.css" />
+<link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" />
+<link href="default.css" rel="stylesheet" type="text/css" />
+<script src="js/jquery-1.8.2.min.js"></script>
+<script src="js/jquery.mobile-1.4.0.min.js"></script>
+<script src="js/jquery.bpopup.min.js"></script>
+<script type="text/javascript" src="cordova.js"></script>
+<script type="text/javascript" src="js/index.js"></script>
+<script type="text/javascript" src="js/pub.js"></script>
+<script type="text/javascript" src="js/checklogin.js"></script>
+
+    <script type="text/javascript">
+    
+    var VideoTypeID = "";
+    if(window.localStorage.getItem("VideoTypeID")!=null) VideoTypeID = window.localStorage.getItem("VideoTypeID");
+
+    $(document).ready(function(event) {
+                          //login
+                          CheckUserToken(userToken,"","","","");
+                          
+                          loadData_VideoCate1();
+                          loadData_RelatedApp();
+                      
+                          if(VideoTypeID=="1" || VideoTypeID=="3" || VideoTypeID=="4" || VideoTypeID=="6"){
+                              $('#Cate'+VideoTypeID).css('background-image','url(images/menu_bg_over120.png)');
+                          }else{
+                              $('#Cate'+VideoTypeID).css('background-image','url(images/menu_bg_over100.png)');
+                          }
+                          
+                          if(eval(VideoTypeID) > 2 && eval(VideoTypeID) < 6){
+                          $( "#top_menu" ).scrollLeft( 220 );
+                          }else if(eval(VideoTypeID) >= 6){
+                          $( "#top_menu" ).scrollLeft( 450 );
+                          }
+                      });
+    
+    
+    document.addEventListener("deviceready", onDeviceReady, false);
+    
+    function onDeviceReady() {
+        //get device
+        devicePlatform = device.platform;
+        
+        document.addEventListener("resume", onResume, false);
+        
+        //lock screen
+        screen.lockOrientation('landscape');
+        
+        //console.log('Orientation is ' + screen.orientation);
+        
+        //All pages at least 100% of viewport height
+        var viewPortHeight = $(window).height();
+        var headerHeight = $('div[data-role="header"]').height();
+        var footerHeight = $('div[data-role="footer"]').height();
+        var contentHeight = viewPortHeight - headerHeight - footerHeight;
+        //alert(contentHeight);
+        // Set all pages with class="page-content" to be at least contentHeight
+        $('div[class="dv_content"]').css({'height': contentHeight + 'px'});
+        
+    }
+    
+    //Page Number
+    var PageNum_VideoCate1 = 1;
+    function loadData_VideoCate1(){
+        $("#loader").show();
+        $.ajax({
+               type : "GET",
+               dataType : "jsonp",
+               url : "http://210.65.89.114/TADE/Xml/VideoCate1.aspx",
+               crossDomain: true,
+               contentType: "application/json; charset=utf-8",
+               data : {"PageNum":PageNum_VideoCate1,"Device":devicePlatform,"VideoTypeID":VideoTypeID},
+               success: function(obj){
+               genTableView_VideoCate1(obj);
+               },
+               error: function(xhr, status, error) { alert('讀取資料失敗 !!'); },
+               async: false,
+               cache: false
+               });
+    }
+    
+    
+    var jsonObj;
+
+    function genTableView_VideoCate1(jsonData){
+        //NKLog(PageNum);
+        jsonObj = jsonData;
+        
+        if(PageNum_VideoCate1 == 1){
+            document.getElementById('dv_list').innerHTML = "";
+            
+        }
+
+        for(loopy = 0; loopy < jsonObj.datas.length; loopy++){
+
+            var dv_sub_id = "dv_"+jsonObj.datas[loopy].VideoCate1_ID;
+            
+            $("#dv_list").append("<div class=\"title_01\" style=\"padding-top:5px;\"><font color=white>"+unescape(jsonObj.datas[loopy].VideoCate1)+"</font></div>");
+            $("#dv_list").append("<div id=\""+dv_sub_id+"\" style=\"width:100%;overflow:auto;padding-top:5px;-webkit-overflow-scrolling: touch;\"></div>");
+
+            //load VideoCate2
+            loadData_VideoCate2(jsonObj.datas[loopy].VideoCate1_ID,dv_sub_id);
+
+            TotalPage = jsonObj.datas[loopy].TotalPage;
+            
+        }
+
+        PageNum_VideoCate1 = PageNum_VideoCate1 + 1;
+        
+        $("#loader").hide();
+
+    }
+    
+    
+    //Page Number
+    var PageNum_VideoCate2 = 1;
+    function loadData_VideoCate2(VideoCate1_ID,fill_dv_id){
+        $("#loader").show();
+        $.ajax({
+               type : "GET",
+               dataType : "jsonp",
+               url : "http://210.65.89.114/TADE/Xml/VideoCate2.aspx",
+               crossDomain: true,
+               contentType: "application/json; charset=utf-8",
+               data : {"PageNum":PageNum_VideoCate2,"VideoCate1_ID":VideoCate1_ID,"Device":devicePlatform},
+               success: function(obj){
+               genTableView_VideoCate2(obj,fill_dv_id);
+               },
+               error: function(xhr, status, error) { alert('讀取資料失敗 !!'); },
+               async: false,
+               cache: false
+               });
+    }
+    var TotalPage_VideoCate2;
+    var TotalPage_VideoCate2_first = false;
+    function genTableView_VideoCate2(jsonData,fill_dv_id){
+        //NKLog(PageNum);
+        jsonObj = jsonData;
+        
+        if(PageNum_VideoCate2 == 1){
+            document.getElementById(fill_dv_id).innerHTML = "";
+            
+        }
+        
+        var tableView = "<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">";
+        tableView += "<tr>";
+        for(loopy = 0; loopy < jsonObj.datas.length; loopy++){
+            
+            
+            tableView += "  <td width=\"5\">&nbsp;</td>";
+            tableView += "  <td width=\"100\">";
+            tableView += "    <a href=\"#\" onclick=\"video_list("+jsonObj.datas[loopy].VideoCate2_ID+")\"><div><img src='"+jsonObj.datas[loopy].BannerImg+"' width='100' style='display:block;' border=0 /></div></a>";
+            tableView += "    <div style=\"background-color:#222D3C;padding:3px;height:36px\"><a href=\"#\" onclick=\"video_list("+jsonObj.datas[loopy].VideoCate2_ID+")\" class=\"list_link_small_w\">"+unescape(jsonObj.datas[loopy].VideoCate2)+"</a></div>";
+            tableView += "  </td>";
+            
+            if(loopy==jsonObj.datas.length-1 && loopy < 2){
+                for(var loopy_col = 0;loopy_col<(2-loopy);loopy_col++){
+                    tableView += "  <td width=\"25\">&nbsp;</td>";
+                    tableView += "  <td width=\"200\">&nbsp;</td>";
+                    tableView += "  <td width=\"25\">&nbsp;</td>";
+                    tableView += "  <td width=\"200\">&nbsp;</td>";
+                    tableView += "  <td width=\"25\">&nbsp;</td>";
+                    tableView += "  <td width=\"200\">&nbsp;</td>";
+                }
+            }
+            
+            TotalPage_VideoCate2 = jsonObj.datas[loopy].TotalPage;
+            
+            
+            if(loopy==0 && !TotalPage_VideoCate2_first) {
+                video_list(jsonObj.datas[loopy].VideoCate2_ID);
+                TotalPage_VideoCate2_first = true;
+            }
+            
+        }
+        tableView += "</tr>";
+        tableView += "</table>";
+        
+        document.getElementById(fill_dv_id).innerHTML = tableView;
+        PageNum_VideoCate2 = PageNum_VideoCate2 + 1;
+        
+    }
+    
+    function loadData_RelatedApp(){
+        
+        $.ajax({
+               type : "GET",
+               dataType : "jsonp",
+               url : "http://210.65.89.114/TADE/Xml/RelatedApp.aspx",
+               crossDomain: true,
+               contentType: "application/json; charset=utf-8",
+               data : {"Device":devicePlatform},
+               success: function(obj){
+               genTableView_RelatedApp(obj);
+               },
+               error: function(xhr, status, error) { alert('讀取資料失敗 !!'); },
+               async: false,
+               cache: false
+               });
+    }
+    function genTableView_RelatedApp(jsonData){
+        
+        //NKLog(PageNum);
+        var jsonObj_RA = jsonData;
+        
+        var htmlView = "";
+        for(loopy = 0; loopy < jsonObj_RA.datas.length; loopy++){
+            
+            htmlView += "<img src=\"images/menu_icon_line.png\" width=\"98%\" height=\"2\"";
+            
+            htmlView += "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">";
+            htmlView += "<tr>";
+            htmlView += "<td width=\"45\"><img src=\""+jsonObj_RA.datas[loopy].AppImg+"\" width=\"45\" /></td>";
+            htmlView += "<td bgcolor=\"#2F2E2E\"><a href=\"#\" onclick=\"OpenBrowser('"+jsonObj_RA.datas[loopy].AppUrl+"');\" class=\"rightmenu_link\">"+unescape(jsonObj_RA.datas[loopy].AppName)+"</a></td>";
+            htmlView += "</tr>";
+            htmlView += "</table>";
+        }
+        
+        $("#dv_relatedapp").append(htmlView);
+        
+    }
+
+    function onResume(){
+        reloadPage();
+    }
+
+    //reload page
+    function reloadPage(){
+        $(window).scrollTop(0);
+        PageNum_VideoCate1 = 1;
+        PageNum_VideoCate2 = 1;
+        loadData_VideoCate1();
+        loadData_RelatedApp();
+    }
+
+    //Page Number
+    var PageNumList = 1;
+    function video_list(VideoCate2_ID){
+        
+        window.localStorage.setItem('VideoCate2_ID',VideoCate2_ID);
+        
+        //location = 'video_list.html';
+        PageNumList = 1;
+        loadDataList();
+    }
+
+    function loadDataList(){
+        
+        var VideoCate2_ID = window.localStorage.getItem("VideoCate2_ID");
+        
+        //$("#loader").show();
+        $.ajax({
+               type : "GET",
+               dataType : "jsonp",
+               url : "http://210.65.89.114/TADE/Xml/Video.aspx",
+               crossDomain: true,
+               contentType: "application/json; charset=utf-8",
+               data : {"PageNum":PageNumList,"VideoCate2_ID":VideoCate2_ID,"Device":devicePlatform},
+               success: function(obj){
+               genTableViewList(obj);
+               },
+               error: function(xhr, status, error) { alert('讀取資料失敗 !!'); },
+               async: false,
+               cache: false
+               });
+    }
+    
+    
+    var jsonObjList;
+    var TotalPageList;
+    function genTableViewList(jsonData){
+        
+        //NKLog(PageNum);
+        jsonObjList = jsonData;
+        
+        if(PageNumList == 1){
+            document.getElementById('dv_list2').innerHTML = "";
+            
+        }
+        
+        var tableView = "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">";
+        var bg_color = "#FAEDE9";
+        for(var loopy = 0; loopy < jsonObjList.datas.length; loopy++){
+            if(loopy % 2 == 1) {
+                bg_color = "#FAEDE9";
+            }else{
+                bg_color = "#ffffff";
+            }
+            
+            tableView += "<tr>";
+            tableView += "  <td><table width=\"100%\" border=\"0\" cellpadding=\"6\" cellspacing=\"0\" bgcolor=\""+bg_color+"\">";
+            tableView += "  <tr><td width=\"100\">";
+            tableView += "    <a href=\"#\" onclick=\"video_detail('"+jsonObjList.datas[loopy].VideoID+"','"+jsonObjList.datas[loopy].FreeFlag+"');\"><img src='"+jsonObjList.datas[loopy].SpeakerPhoto+"' width='100' style='display:block;' border=0 /></a>";
+            
+            tableView += "<img src='images/"+(!chkFavoriteExist('video',jsonObjList.datas[loopy].VideoID)?"btn_favorite_01.png":"btn_favorite_02.png")+"' width='100' style='display:block;' border=0 onclick=\"addFavorite('video','"+jsonObjList.datas[loopy].VideoID+"','"+unescape(jsonObjList.datas[loopy].MeetingTitle)+"','"+jsonObjList.datas[loopy].MeetingFileUrl+"','"+jsonObjList.datas[loopy].MeetingDate+"','"+unescape(jsonObjList.datas[loopy].Speaker)+"','"+jsonObjList.datas[loopy].SpeakerPhoto+"');if(this.src.indexOf('images/btn_favorite_01.png')==-1){this.src='images/btn_favorite_01.png'}else{this.src='images/btn_favorite_02.png'};\" />";
+            
+            tableView += "  </td>";
+            
+            tableView += "  <td valign=\"top\">";
+            tableView += "    <a href=\"#\" onclick=\"video_detail('"+jsonObjList.datas[loopy].VideoID+"','"+jsonObjList.datas[loopy].FreeFlag+"');\" class=\"list_link_thin\">"+unescape(jsonObjList.datas[loopy].MeetingTitle)+"</a>";
+            tableView += "<div class='date' style='padding-top:8px;'>" + jsonObjList.datas[loopy].MeetingDate + " " + unescape(jsonObjList.datas[loopy].Speaker) + "</div>";
+            tableView += "  </td>";
+            tableView += "  </tr>";
+            tableView += "  </table></td>";
+            tableView += "</tr>";
+            
+            TotalPageList = jsonObjList.datas[loopy].TotalPage;
+
+        }
+        
+        tableView += "</table>";
+        
+        $("#dv_list2").append(tableView);
+        
+        PageNumList = PageNumList + 1;
+        
+        $("#loader2").hide();
+    }
+    function video_detail(VideoID,FreeFlag){
+        
+        //window.localStorage.setItem('inapp_url',MeetingFileUrl);
+        
+        //location = 'inapp_browser.html';
+        if(FreeFlag!="True" && loginOK!="Y"){
+            //$("#dv_loginPopup").popup("open");
+            $("#dv_loginPopup").bPopup();
+                                         
+        }else{
+            window.localStorage.setItem('VideoID',VideoID);
+            location='video_detail.html';
+            /*
+            $.ajax({
+                   type : "GET",
+                   dataType : "jsonp",
+                   url : "http://210.65.89.114/TADE/Xml/VideoDetail.aspx",
+                   crossDomain: true,
+                   contentType: "application/json; charset=utf-8",
+                   data : {"Device":devicePlatform,"VideoID":VideoID},
+                   success: function(obj){
+                   genTableView_Detail(obj);
+                   },
+                   error: function(xhr, status, error) { alert('讀取資料失敗 !!'); },
+                   async: false,
+                   cache: false
+                   });
+            */
+        }
+        
+    }
+    function genTableView_Detail(jsonData){
+        
+        //NKLog(PageNum);
+        var jsonObj_Dt = jsonData;
+        
+        var tableView = "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">";
+        
+        for(loopy = 0; loopy < jsonObj_Dt.datas.length; loopy++){
+            
+            tableView += "<tr>";
+            tableView += "  <td><table width=\"100%\" border=\"0\" cellpadding=\"6\" cellspacing=\"0\">";
+            tableView += "  <tr>";
+            tableView += "  <td valign=\"top\" colspan=2>";
+            tableView += "    <a href=\"#\" onclick=\"update_read_count('video','"+jsonObj_Dt.datas[loopy].VideoID+"');OpenUrlByDevice('"+jsonObj_Dt.datas[loopy].MeetingFileUrl+"');\" class=\"list_link_thin\">"+unescape(jsonObj_Dt.datas[loopy].MeetingTopic)+"</a>";
+            tableView += "<div class='date' style='padding-top:8px;'>" + unescape(jsonObj_Dt.datas[loopy].MeetingGroup) + "</div>";
+            tableView += "<div class='date' style='padding-top:8px;'>" + unescape(jsonObj_Dt.datas[loopy].MeetingSpeaker) + "</div>";
+            tableView += "  </td>";
+            tableView += "  </tr>";
+            
+            tableView += "  <tr>";
+            tableView += "  <td valign=\"top\">";
+            tableView += "    <a href=\"#\" onclick=\"update_read_count('video','"+jsonObj_Dt.datas[loopy].VideoID+"');OpenUrlByDevice('"+jsonObj_Dt.datas[loopy].MeetingFileUrl+"');\" class=\"list_link_thin\">"+unescape(jsonObj_Dt.datas[loopy].MeetingTitle)+"</a>";
+            tableView += "<div class='date' style='padding-top:8px;'>" + jsonObj_Dt.datas[loopy].MeetingDate + " " + unescape(jsonObj_Dt.datas[loopy].Speaker) + "</div>";
+            tableView += "<div class='date' style='padding-top:8px;'>" + unescape(jsonObj_Dt.datas[loopy].MeetingPlace) + "</div>";
+            tableView += "  </td>";
+            tableView += "  <td valign=\"top\">";
+            tableView += "  <img src=\""+jsonObj_Dt.datas[loopy].TitleImg+"\" style='max-width:150px;display:block;' border=0 />";
+            tableView += "  </td>";
+            tableView += "  </tr>";
+            
+            tableView += "  <tr><td colspan=2 bgcolor=\"#C4C4C4\">";
+            
+            if(jsonObj_Dt.datas[loopy].VideoDesc==""){
+                tableView += "    <a href=\"#\" onclick=\"update_read_count('video','"+jsonObj_Dt.datas[loopy].VideoID+"');OpenUrlByDevice('"+jsonObj_Dt.datas[loopy].MeetingFileUrl+"');\"><img src='"+jsonObj_Dt.datas[loopy].SpeakerPhoto+"' width='80%' style='display:block;' border=0 /></a>";
+            }else{
+                tableView += "    <a href=\"#\" class=\"desc_link_thin\" onclick=\"update_read_count('video','"+jsonObj_Dt.datas[loopy].VideoID+"');OpenUrlByDevice('"+jsonObj_Dt.datas[loopy].MeetingFileUrl+"');\"><img src='"+jsonObj_Dt.datas[loopy].SpeakerPhoto+"' width='80' style='display:block;' border=0 align=right vspace=5 hspace=5 />"+unescape(jsonObj_Dt.datas[loopy].VideoDesc)+"</a><br>";
+            }
+            
+            tableView += "<img src='images/"+(!chkFavoriteExist('video',jsonObj_Dt.datas[loopy].VideoID)?"btn_favorite_01.png":"btn_favorite_02.png")+"' width='100' style='display:block;' border=0 onclick=\"addFavorite('video','"+jsonObj_Dt.datas[loopy].VideoID+"','"+unescape(jsonObj_Dt.datas[loopy].MeetingTitle)+"','"+jsonObj_Dt.datas[loopy].MeetingFileUrl+"','"+jsonObj_Dt.datas[loopy].MeetingDate+"','"+unescape(jsonObj_Dt.datas[loopy].Speaker)+"','"+jsonObj_Dt.datas[loopy].SpeakerPhoto+"');if(this.src.indexOf('images/btn_favorite_01.png')==-1){this.src='images/btn_favorite_01.png'}else{this.src='images/btn_favorite_02.png'};\" />";
+            
+            tableView += "  </td>";
+            tableView += "  </tr>";
+            
+            tableView += "  </table></td>";
+            tableView += "</tr>";
+        }
+        tableView += "</table>";
+        
+        $("#dv_detail").html(tableView);
+        
+        $("#dv_detail").popup("open");
+        
+    }
+    
+    window.onscroll = function () {
+        
+        if ($(window).scrollTop() == $(document).height() - $(window).height() && PageNumList <= TotalPageList) {
+            
+            loadDataList();
+        }
+        
+    }
+
+    //login
+    function checkForm(){
+        if(document.fm_login.uid.value==""){
+            navigator.notification.alert(
+                                         '請填寫帳號',  // message
+                                         doDummy,         // callback
+                                         '登入',            // title
+                                         '確定'                  // buttonName
+                                         );
+                                         document.fm_login.uid.focus();
+                                         event.returnValue = false;
+        }else if(document.fm_login.pwd.value==""){
+            navigator.notification.alert(
+                                         '請填寫密碼',  // message
+                                         doDummy,         // callback
+                                         '登入',            // title
+                                         '確定'                  // buttonName
+                                         );
+                                         document.fm_login.pwd.focus();
+                                         event.returnValue = false;
+        }else{
+            login(document.fm_login.uid.value,document.fm_login.pwd.value);
+            event.returnValue=false;
+        }
+    }
+    
+    function login(strUid,strPwd){
+        document.getElementById('dv_login').style.display='none';
+        document.getElementById('dv_loading').style.display='block';
+        
+        $.ajax({
+               type : "GET",
+               dataType : "jsonp",
+               url : "http://www.tade.org.tw/TADE/SSO.aspx",
+               crossDomain: true,
+               contentType: "application/json; charset=utf-8",
+               data : {"uid":strUid,"pwd":strPwd},
+               success: function(obj){
+               loginProcess(obj);
+               },
+               error: function(xhr, status, error) {
+               doLoginFail();
+               },
+               async: false,
+               cache: false
+               });
+    }
+    
+    function loginProcess(jsonData){
+        //NKLog(PageNum);
+        var jsonObjLogin = jsonData;
+        
+        var tokenStatus = "";
+        var tokenGuid = "";
+        var username = "";
+        
+        //tableView += "<div style=\"width: 100%;\">";
+        
+        if(jsonObjLogin!=null && jsonObjLogin.datas.length>0){
+            tokenStatus = jsonObjLogin.datas[0].tokenStatus;
+            tokenGuid = jsonObjLogin.datas[0].tokenGuid;
+            tokenExpiration = jsonObjLogin.datas[0].tokenExpiration;
+            username = unescape(jsonObjLogin.datas[0].username);
+        }
+        
+        if(tokenStatus!="OK"){
+            doLoginFail();
+            
+        }else{
+            navigator.notification.alert(
+                                         '歡迎登入',  // message
+                                         doDummy,         // callback
+                                         '登入',            // title
+                                         '確定'                  // buttonName
+                                         );
+                                         
+                                         //set token and user info
+                                         window.localStorage.setItem('userToken', tokenGuid);
+                                         window.localStorage.setItem('uid', document.fm_login.uid.value);
+                                         window.localStorage.setItem('username', username);
+                                         
+                                         loginOK = "Y";
+                                         document.getElementById('dv_loading').style.display='none';
+                                         //$("#dv_loginPopup").popup("close");
+                                         $("#dv_loginPopup").bPopup().close();
+                                         
+        }
+    }
+    
+    function doLoginFail(){
+        navigator.notification.alert(
+                                     '登入錯誤！',  // message
+                                     doDummy,         // callback
+                                     '登入',            // title
+                                     '確定'                  // buttonName
+                                     );
+                                     
+                                     document.getElementById('dv_login').style.display='block';
+                                     document.getElementById('dv_loading').style.display='none';
+                                     
+    }
+    </script>
+    </head>
+    <body>
+        <div id="demo-page" data-role="page" data-url="demo-page" data-theme="a">
+            <div data-role="header" data-position="fixed" style="background-color:#ffffff;height:90px;border:#ffffff 0px solid;">
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td width="60" align="center"><a href="#" onclick="location='index.html';"><img src="images/top_logo.png" height="40" border="0" /></a></td>
+                        <td><a href="#"><img src="images/top_logo_text.png" height="50" border="0" /></a></td>
+                        <td width="45"><a href="#" onclick="$( '#right-panel' ).panel().panel('open');"><img src="images/top_menu.png" height="40" border="0" /></a></td>
+                    </tr>
+                </table>
+                <div id="top_menu" style="background-image:url(images/menu_bg.png);width:100%; height:30px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling: touch;">
+                    <table width="685" border="0" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td width="100" align="center"><a href="#" onclick="location='aboutus.html';" class="menu_link">學會訊息</a></td>
+                            <td width="1"><img src="images/menu_line.png" height="25" /></td>
+                            <td width="120" align="center" id="Cate1"><a href="#" onclick="LoadCate(1);" class="menu_link">學會學術演講</a></td>
+                            <td width="1"><img src="images/menu_line.png" height="25" /></td>
+                            <td width="120" align="center" id="Cate3"><a href="#" onclick="LoadCate(3);" class="menu_link">繼續教育演講</a></td>
+                            <td width="1"><img src="images/menu_line.png" height="25" /></td>
+                            <td width="120" align="center" id="Cate4"><a href="#" onclick="LoadCate(4);" class="menu_link">衛教雲端電台</a></td>
+                            <td width="1"><img src="images/menu_line.png" height="25" /></td>
+                            <td width="120" align="center" id="Cate6"><a href="#" onclick="LoadCate(6);" class="menu_link">個人職能精進</a></td>
+                            <td width="1"><img src="images/menu_line.png" height="25" /></td>
+                            <td width="100" align="center"><a href="#" onclick="location='doc_list.html';" class="menu_link">文獻快遞</a></td>
+                        </tr>
+                    </table>
+
+                </div>
+            </div>
+            <div data-role="content" data-theme="a" style="margin:0;padding:0;background-color:#444;">
+                <div id="dv_left" style="width:50%;float:left;overflow-y:auto;-webkit-overflow-scrolling: touch;" class="dv_content">
+                    <div id="dv_list" style="padding:5px;">
+                    </div>
+                    <div style="text-align:center;padding:5px">
+                        <img id="loader" alt="Loading" src="images/loading.gif" style="display: none" />
+                    </div>
+                </div>
+                <div id="dv_right" style="width:50%;float:left;overflow-y:auto;-webkit-overflow-scrolling: touch;" class="dv_content">
+                    <div id="dv_list2" style="padding:5px;">
+                    </div>
+                    <div style="text-align:center;padding:5px">
+                        <img id="loader2" alt="Loading" src="images/loading.gif" style="display: none" />
+                    </div>
+                </div>
+                <div data-role="popup" id="dv_detail" data-theme="a" data-overlay-theme="b" data-transition="slideup"></div>
+                <div id="dv_loginPopup" style="width:95%;padding:10px;background-color:#fff;display:none;">
+                    <div id="dv_login" style="width:95%;padding:10px;">
+                        本影片僅限會員觀看，請登入會員<br><a href="#" onclick="OpenBrowser('https://www.tade.org.tw/mobile/member/signup.asp');">線上入會申請</a>
+                        <form name="fm_login" onsubmit="checkForm();" method="get">
+                            <div data-role="fieldcontain" style="text-align:left;">
+                                <label for="uid">會員帳號:</label>
+                                <input type="text" name="uid" id="uid" value=""  />
+                            </div>
+                            <div data-role="fieldcontain" style="text-align:left;">
+                                <label for="pwd">會員密碼:</label>
+                                <input type="password" name="pwd" id="pwd" value=""  />
+                            </div>
+                            <div data-role="fieldcontain">
+                                <fieldset class="ui-grid-a">
+                                    <div class="ui-block-c"><button type="button" data-theme="a" onclick="$('#dv_loginPopup').bPopup().close();window.localStorage.removeItem('VideoID');">關閉</button></div>
+                                    <div class="ui-block-c"><button type="reset" data-theme="a">重設</button></div>
+                                    <div class="ui-block-c"><button type="submit" data-theme="d">送出</button></div>
+                                </fieldset>
+                            </div>
+                        </form>
+                    </div>
+                    <div id="dv_loading" style="display:none;width:300px;height:400px;">
+                        <br><br><br><img src="images/loading.gif"  width="32" />
+                    </div>
+                </div>
+            </div>
+            <div id="footer" data-role="footer" data-theme="a" style="background-color:#A95C68;margin:0;padding:0;height:35px" data-position="fixed" data-tap-toggle="false">
+                <div >
+                    <span style="float:left;"><a href="#" onclick="onBackKey();"><img src="images/btn_back.png" width="35" border="0" /></a></span>
+                    <span style="float:right;"><a href="#" onclick="location='index.html';"><img src="images/btn_home.png" width="35" border="0" /></a><span>
+                        </div>
+            </div>
+            <div data-role="panel" id="right-panel" data-position="right" data-display="overlay" style="background-color:#2F2E2E;margin:0;padding:0">
+                <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td width="50"><img src="images/menu_icon_01.png" width="50" /></td>
+                                <td bgcolor="#2F2E2E"><a href="#" onclick="location='index.html';" class="rightmenu_link">Home</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td><img src="images/menu_icon_line.png" height="2" width="98%" /></td>
+                    </tr>
+                    <tr>
+                        <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td bgcolor="#2F2E2E">
+                                    <form action="#" method="get" onsubmit="searchChk();">
+                                        <div data-role="fieldcontain">
+                                            <input type="search" name="SearchStr" id="SearchStr" value="" />
+                                        </div>
+                                    </form>
+                                </td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td><img src="images/menu_icon_line.png" height="2" width="98%" /></td>
+                    </tr>
+                    <tr>
+                        <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td width="45"><img src="images/menu_icon_06.png" width="45" /></td>
+                                <td bgcolor="#2F2E2E"><a href="#" onclick="location='favorite.html';" class="rightmenu_link">我的收藏</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td><img src="images/menu_icon_line.png" height="2" width="98%" /></td>
+                    </tr>
+                    <tr>
+                        <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td width="45"><img src="images/menu_icon_10.png" width="45" /></td>
+                                <td bgcolor="#2F2E2E"><a href="#" id="sp_login" class="rightmenu_link">會員登入</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div id="dv_relatedapp"></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><img src="images/menu_icon_line.png" height="2" width="98%" /></td>
+                    </tr>
+                    <tr>
+                        <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td width="45"><img data-rel="close" src="images/menu_icon_09.png" width="45" /></td>
+                                <td bgcolor="#2F2E2E"><a href="#" onclick="location='manual.html';" class="rightmenu_link">使用說明</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td><img src="images/menu_icon_line.png" height="2" width="98%" /></td>
+                    </tr>
+                    <tr>
+                        <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td width="45"><img data-rel="close" src="images/menu_icon_08.png" width="45" /></td>
+                                <td bgcolor="#2F2E2E"><a href="#" data-rel="close" class="rightmenu_link">關閉</a></td>
+                            </tr>
+                        </table></td>
+                    </tr>
+                    <tr>
+                        <td><img src="images/menu_icon_line.png" height="2" width="98%" /></td>
+                    </tr>
+                </table>
+            </div><!-- /panel -->
+        </div>
+    </body>
+</html>

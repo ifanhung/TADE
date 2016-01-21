@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="themes/Bootstrap.css">
+<link rel="stylesheet" href="css/jquery.mobile.structure-1.4.0.min.css" />
+<link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" />
+<link href="default.css" rel="stylesheet" type="text/css" />
+<link href="iosSlider.css" rel="stylesheet" type="text/css" />
+<script src="js/jquery-1.8.2.min.js"></script>
+<script src="js/jquery.mobile-1.4.0.min.js"></script>
+<script src="js/jquery.iosslider.js"></script>
+
+<script type="text/javascript" src="cordova.js"></script>
+<script type="text/javascript" src="js/index.js"></script>
+<script type="text/javascript" src="js/pub.js"></script>
+<script type="text/javascript" src="js/checklogin.js"></script>
+
+    <script type="text/javascript">
+
+    $(document).ready(function () {
+                      $('.iosSlider').iosSlider({
+                                                scrollbar: true,
+                                                snapToChildren: true,
+                                                desktopClickDrag: true,
+                                                scrollbarLocation: 'top',
+                                                scrollbarMargin: '10px 10px 0 10px',
+                                                scrollbarBorderRadius: '0',
+                                                responsiveSlideWidth: true,
+                                                navSlideSelector: $('.iosSliderButtons .button'),
+                                                infiniteSlider: true,
+                                                startAtSlide: '1',
+                                                autoSlide: true
+                                                });
+                      
+                      
+                      function slideContentChange(args) {
+                      /* indicator */
+                      $(args.sliderObject).parent().find('.iosSliderButtons .button').removeClass('selected');
+                      $(args.sliderObject).parent().find('.iosSliderButtons .button:eq(' + (args.currentSlideNumber) + ')').addClass('selected');
+                      
+                      }
+                      
+                      function slideContentLoaded(args) {
+                      
+                      /* indicator */
+                      $(args.sliderObject).parent().find('.iosSliderButtons .button').removeClass('selected');
+                      $(args.sliderObject).parent().find('.iosSliderButtons .button:eq(' + (args.currentSlideNumber) + ')').addClass('selected');
+                      
+                      }
+                      
+                      });
+    
+    
+    document.addEventListener("deviceready", onDeviceReady, false);
+    
+    function onDeviceReady() {
+        //get device
+        devicePlatform = device.platform;
+        
+        document.addEventListener("resume", onResume, false);
+        
+    }
+    
+    function onResume(){
+        
+    }
+    
+    </script>
+    </head>
+    <body>
+        <div id="demo-page" data-role="page" data-url="demo-page" data-theme="a">
+            
+            <div data-role="content" data-theme="a" style="margin:0;padding:0;">
+                <div style="position:absolute;top:5px;left:-13px;z-index:999">
+                    <a href="#" onclick="location='index.html'"><img src="images/menu_icon_08.png" width="45" border="0" /></a>
+                </div>
+                <div class="sliderContainer">
+                    <div class="iosSlider">
+                        <div class="slider">
+                            <div class="slide"><img src="images/manual_1.png" style="max-width:100%;max-height:100%;margin:auto;display:block" /></div>
+                            <div class="slide"><img src="images/manual_2.png" style="max-width:100%;max-height:100%;margin:auto;display:block"/></div>
+                            <div class="slide"><img src="images/manual_3.png" style="max-width:100%;max-height:100%;margin:auto;display:block" /></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </body>
+</html>
